@@ -1,0 +1,52 @@
+import os
+import sys
+
+def get_folder_path():
+    return input("Enter the path to the folder: ")
+
+def get_file_size():
+    while True:
+        try:
+            size = int(input("Enter the file size in bytes: "))
+            return size
+        except ValueError:
+            print("Please enter a valid number.")
+
+def get_deletion_criteria():
+    while True:
+        choice = input("Do you want to delete files larger or smaller than the specified size? (Enter 'larger' or 'smaller'): ").strip().lower()
+        if choice in ['larger', 'smaller']:
+            return choice
+        else:
+            print("Invalid input. Please enter 'larger' or 'smaller'.")
+
+def confirm_deletion():
+    input("Press any key to continue and delete the files...")
+
+def delete_files(folder_path, file_size, criteria):
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            try:
+                if os.path.isfile(file_path):
+                    file_size_bytes = os.path.getsize(file_path)
+                    if (criteria == 'larger' and file_size_bytes > file_size) or (criteria == 'smaller' and file_size_bytes < file_size):
+                        print(f"Deleting file: {file_path}")
+                        os.remove(file_path)
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+
+if __name__ == "__main__":
+    folder_path = get_folder_path()
+    if not os.path.isdir(folder_path):
+        print("The provided path is not a valid directory.")
+        sys.exit(1)
+
+    file_size = get_file_size()
+    criteria = get_deletion_criteria()
+    
+    print(f"\nYou have chosen to delete files in '{folder_path}' which are {criteria} than {file_size} bytes.")
+    confirm_deletion()
+    
+    delete_files(folder_path, file_size, criteria)
+    print("File deletion process completed.")
